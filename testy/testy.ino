@@ -67,7 +67,11 @@ void loop() {
     Serial1.println(klawisz);
   }
 }
-
+/**
+  * Funkcja wykonuje odpowiedni ruch silnika w zależności od podanej komendy.
+  *
+  * \param[in] command Litera komendy.
+  */
 void executeCommand(char command) {
   switch (command) {
     case UP:
@@ -83,12 +87,14 @@ void executeCommand(char command) {
       stepper2.move(-40);
       break;
     case START:
+      // Enable motors
       stepper1.enableOutputs();
       stepper2.enableOutputs();
       break;
     case STOP:
-      stepper1.disableOutputs(); // odłącza silnik
-      stepper2.disableOutputs(); // odłącza silnik
+      // Disable motors
+      stepper1.disableOutputs();
+      stepper2.disableOutputs();
       break;
     default:
       //Invalid command received
