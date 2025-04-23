@@ -1,10 +1,13 @@
 #include <Keypad.h>      //biblioteka do klawiatury
 #include <AccelStepper.h> //biblioteka do silnikow krokowych
 
+// Przyciski w aplikacji
 #define LEFT 'L'
 #define RIGHT 'R'
 #define UP 'F'
 #define DOWN 'B'
+#define START 'A'
+#define STOP 'P'
 // Silnik 1
 #define STEP1_PIN 10
 #define DIR1_PIN 9
@@ -68,24 +71,24 @@ void loop() {
 void executeCommand(char command) {
   switch (command) {
     case UP:
-      digitalWrite(13, HIGH);
-      delay(500);
-      digitalWrite(13, LOW);
+      stepper1.move(40);
       break;
     case DOWN:
-      digitalWrite(13, HIGH);
-      delay(500);
-      digitalWrite(13, LOW);
+      stepper1.move(-40);
       break;
     case LEFT:
-      digitalWrite(13, HIGH);
-      delay(2000);
-      digitalWrite(13, LOW);
+      stepper2.move(40);
       break;
     case RIGHT:
-      digitalWrite(13, HIGH);
-      delay(2000);
-      digitalWrite(13, LOW);
+      stepper2.move(-40);
+      break;
+    case START:
+      stepper1.enableOutputs();
+      stepper2.enableOutputs();
+      break;
+    case STOP:
+      stepper1.disableOutputs(); // odłącza silnik
+      stepper2.disableOutputs(); // odłącza silnik
       break;
     default:
       //Invalid command received
