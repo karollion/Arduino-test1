@@ -1,9 +1,21 @@
-#include <Keypad.h> //biblioteka do klawiatury
+#include <Keypad.h>      //biblioteka do klawiatury
+#include <AccelStepper.h> //biblioteka do silnikow krokowych
 
 #define LEFT 'L'
 #define RIGHT 'R'
 #define UP 'F'
 #define DOWN 'B'
+// Silnik 1
+#define STEP1_PIN 10
+#define DIR1_PIN 9
+#define EN1_PIN 8
+// Silnik 2
+#define STEP2_PIN 5
+#define DIR2_PIN 6
+#define EN2_PIN 7
+
+AccelStepper stepper1(AccelStepper::DRIVER, STEP1_PIN, DIR1_PIN);
+AccelStepper stepper2(AccelStepper::DRIVER, STEP2_PIN, DIR2_PIN);
 
 const byte ROWS = 4;
 const byte COLS = 3;
@@ -19,12 +31,24 @@ char keys[ROWS][COLS] = { //mapowanie klawiatury
 };
 
 Keypad klawiatura = Keypad(makeKeymap(keys), rowPins, colPins, ROWS, COLS); //inicjalizacja klawiatury
+
 void setup() {
-  // put your setup code here, to run once:
   Serial.begin(9600);  //komunikacja z komputerem
   Serial1.begin(9600); //komunikacja z HC-05 - bluetooth
 
   pinMode(13, OUTPUT);
+
+  stepper1.setMaxSpeed(1000);
+  stepper1.setAcceleration(500);
+  stepper1.setEnablePin(EN1_PIN);
+  stepper1.setPinsInverted(false, false, true); // true - enable aktywne LOW
+  stepper1.disableOutputs(); // na start wyłączony
+
+  stepper2.setMaxSpeed(1000);
+  stepper2.setAcceleration(500);
+  stepper2.setEnablePin(EN2_PIN);
+  stepper2.setPinsInverted(false, false, false);
+  stepper2.disableOutputs();
 }
 
 void loop() {
@@ -68,3 +92,5 @@ void executeCommand(char command) {
       break;
   }
 }
+
+
