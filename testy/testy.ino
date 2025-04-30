@@ -9,13 +9,13 @@
 #define START 'A'
 #define STOP 'P'
 // Silnik 1
-#define STEP1_PIN 10
-#define DIR1_PIN 9
-#define EN1_PIN 8
+#define STEP1_PIN 5
+#define DIR1_PIN 6
+#define EN1_PIN 7
 // Silnik 2
-#define STEP2_PIN 5
-#define DIR2_PIN 6
-#define EN2_PIN 7
+#define STEP2_PIN 10
+#define DIR2_PIN 9
+#define EN2_PIN 8
 
 AccelStepper stepper1(AccelStepper::DRIVER, STEP1_PIN, DIR1_PIN);
 AccelStepper stepper2(AccelStepper::DRIVER, STEP2_PIN, DIR2_PIN);
@@ -47,14 +47,14 @@ void setup() {
 
   pinMode(13, OUTPUT);
 
-  stepper1.setMaxSpeed(1000);
-  stepper1.setAcceleration(500);
+  stepper1.setMaxSpeed(2000);
+  stepper1.setAcceleration(1000);
   stepper1.setEnablePin(EN1_PIN);
   stepper1.setPinsInverted(false, false, true); // true - enable aktywne LOW
   stepper1.disableOutputs(); // na start wyłączony
 
-  stepper2.setMaxSpeed(1000);
-  stepper2.setAcceleration(500);
+  stepper2.setMaxSpeed(2000);
+  stepper2.setAcceleration(1000);
   stepper2.setEnablePin(EN2_PIN);
   stepper2.setPinsInverted(false, false, true);
   stepper2.disableOutputs();
@@ -70,7 +70,7 @@ void loop() {
 
   if (klawisz){
     Serial.println(klawisz);
-    Serial1.println(klawisz);
+    //Serial1.println(klawisz);
 
     executeCommand(klawisz);
   }
@@ -86,24 +86,36 @@ void loop() {
 void executeCommand(char command) {
   switch (command) {
     case UP:
-      stepper1.move(400);
+      stepper1.move(4000);
+      Serial.println("Moving up");
+      printMotorPinStates();
       break;
     case DOWN:
-      stepper1.move(-400);
+      stepper1.move(-4000);
+      Serial.println("Moving down");
+      printMotorPinStates();
       break;
     case LEFT:
-      stepper2.move(400);
+      stepper2.move(4000);
+      Serial.println("Moving left");
+      printMotorPinStates();
       break;
     case RIGHT:
-      stepper2.move(-400);
+      stepper2.move(-4000);
+      Serial.println("Moving right");
+      printMotorPinStates();
       break;
     case START:
       // Enable motors
+      Serial.println("Enable motors");
+      printMotorPinStates();
       stepper1.enableOutputs();
       stepper2.enableOutputs();
       break;
     case STOP:
       // Disable motors
+      Serial.println("Disable motors");
+      printMotorPinStates();
       stepper1.disableOutputs();
       stepper2.disableOutputs();
       break;
@@ -113,4 +125,21 @@ void executeCommand(char command) {
   }
 }
 
+void printMotorPinStates() {
+  int step1State = digitalRead(10);
+  int dir1State = digitalRead(9);
+  int en1State  = digitalRead(8);
+
+  int step2State = digitalRead(5);
+  int dir2State = digitalRead(6);
+  int en2State  = digitalRead(7);
+
+  Serial.print("STEP1: "); Serial.print(step1State);
+  Serial.print(" DIR1: "); Serial.print(dir1State);
+  Serial.print(" EN1: ");  Serial.print(en1State);
+
+  Serial.print(" | STEP2: "); Serial.print(step2State);
+  Serial.print(" DIR2: "); Serial.print(dir2State);
+  Serial.print(" EN2: ");  Serial.println(en2State);
+}
 
