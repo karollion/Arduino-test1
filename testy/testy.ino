@@ -26,11 +26,17 @@ const byte COLS = 3;
 byte rowPins[ROWS] = {23, 25, 27, 29};
 byte colPins[COLS] = {31, 33, 35};
 
-char keys[ROWS][COLS] = { //mapowanie klawiatury
+/**Do klawiatury, znaki jakie na niej są.
   {'1','2','3'},
   {'4','5','6'},
   {'7','8','9'},
   {'*','0','#'}
+*/
+char keys[ROWS][COLS] = { //mapowanie klawiatury
+  {'1','F','3'},
+  {'L','5','R'},
+  {'7','B','9'},
+  {'A','0','P'}
 };
 
 Keypad klawiatura = Keypad(makeKeymap(keys), rowPins, colPins, ROWS, COLS); //inicjalizacja klawiatury
@@ -50,7 +56,7 @@ void setup() {
   stepper2.setMaxSpeed(1000);
   stepper2.setAcceleration(500);
   stepper2.setEnablePin(EN2_PIN);
-  stepper2.setPinsInverted(false, false, false);
+  stepper2.setPinsInverted(false, false, true);
   stepper2.disableOutputs();
 }
 
@@ -65,7 +71,12 @@ void loop() {
   if (klawisz){
     Serial.println(klawisz);
     Serial1.println(klawisz);
+
+    executeCommand(klawisz);
   }
+
+  stepper1.run();
+  stepper2.run();
 }
 /**
   * Funkcja wykonuje odpowiedni ruch silnika w zależności od podanej komendy.
@@ -75,16 +86,16 @@ void loop() {
 void executeCommand(char command) {
   switch (command) {
     case UP:
-      stepper1.move(40);
+      stepper1.move(400);
       break;
     case DOWN:
-      stepper1.move(-40);
+      stepper1.move(-400);
       break;
     case LEFT:
-      stepper2.move(40);
+      stepper2.move(400);
       break;
     case RIGHT:
-      stepper2.move(-40);
+      stepper2.move(-400);
       break;
     case START:
       // Enable motors
