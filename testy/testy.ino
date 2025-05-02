@@ -1,13 +1,6 @@
 #include <Keypad.h>      //biblioteka do klawiatury
 #include <AccelStepper.h> //biblioteka do silnikow krokowych
 
-// Przyciski w aplikacji
-#define LEFT 'L'
-#define RIGHT 'R'
-#define UP 'F'
-#define DOWN 'B'
-#define START 'A'
-#define STOP 'P'
 // Silnik 1
 #define STEP1_PIN 5
 #define DIR1_PIN 6
@@ -25,6 +18,8 @@ const byte COLS = 3;
 
 byte rowPins[ROWS] = {23, 25, 27, 29};
 byte colPins[COLS] = {31, 33, 35};
+
+String commandBuffer = "";
 
 /**Do klawiatury, znaki jakie na niej są.
   {'1','2','3'},
@@ -63,16 +58,22 @@ void setup() {
 void loop() {
   char klawisz = klawiatura.getKey();
 
-  if (Serial1.available()) {
-    char command = Serial1.read();
-    executeCommand(command);
+  // Odczyt z Bluetooth
+  while (Serial1.available()) {
+    char c = Serial1.read();
+    if (c == '\n') {
+      if (commandBuffer.length() > 0) {
+        executeCommand(commandBuffer);
+        commandBuffer = "";
+      }
+    } else {
+      commandBuffer += c;
+    }
   }
 
-  if (klawisz){
+  if (klawisz) {
     Serial.println(klawisz);
-    //Serial1.println(klawisz);
-
-    executeCommand(klawisz);
+    executeCommand(String(klawisz));
   }
 
   stepper1.run();
@@ -83,44 +84,43 @@ void loop() {
   *
   * \param[in] command Litera komendy.
   */
-void executeCommand(char command) {
-  switch (command) {
-    case UP:
-      stepper1.move(4000);
-      Serial.println("Moving up");
-      printMotorPinStates();
+void executeCommand(String cmd) {
+
+  Serial.print("Received command: ");
+  Serial.println(cmd);
+
+  char dir = cmd.charAt(0); // kierunek: F, B, L, R
+  int speed = 1000; // domyślna prędkość
+  if (cmd.length() > 1) {
+    speed = cmd.substring(1).toInt() * 20; // 99 → 1980 (maxSpeed)
+  }
+
+  switch (dir) {
+    case 'F':
+      stepper1.setMaxSpeed(speed);
+      stepper1.move(100000); // symuluj jazdę w nieskończoność
       break;
-    case DOWN:
-      stepper1.move(-4000);
-      Serial.println("Moving down");
-      printMotorPinStates();
+    case 'B':
+      stepper1.setMaxSpeed(speed);
+      stepper1.move(-100000);
       break;
-    case LEFT:
-      stepper2.move(4000);
-      Serial.println("Moving left");
-      printMotorPinStates();
+    case 'L':
+      stepper2.setMaxSpeed(speed);
+      stepper2.move(100000);
       break;
-    case RIGHT:
-      stepper2.move(-4000);
-      Serial.println("Moving right");
-      printMotorPinStates();
+    case 'R':
+      stepper2.setMaxSpeed(speed);
+      stepper2.move(-100000);
       break;
-    case START:
-      // Enable motors
-      Serial.println("Enable motors");
-      printMotorPinStates();
+    case 'Y':
       stepper1.enableOutputs();
       stepper2.enableOutputs();
       break;
-    case STOP:
-      // Disable motors
-      Serial.println("Disable motors");
-      printMotorPinStates();
+    case 'Z':
       stepper1.disableOutputs();
       stepper2.disableOutputs();
       break;
     default:
-      //Invalid command received
       break;
   }
 }
