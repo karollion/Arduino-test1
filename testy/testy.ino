@@ -98,19 +98,19 @@ void executeCommand(String cmd) {
   switch (dir) {
     case 'F':
       stepper1.setMaxSpeed(speed);
-      stepper1.move(100000); // symuluj jazdę w nieskończoność
+      stepper1.move(100); // symuluj jazdę w nieskończoność
       break;
     case 'B':
       stepper1.setMaxSpeed(speed);
-      stepper1.move(-100000);
+      stepper1.move(-100);
       break;
     case 'L':
       stepper2.setMaxSpeed(speed);
-      stepper2.move(100000);
+      stepper2.move(100);
       break;
     case 'R':
       stepper2.setMaxSpeed(speed);
-      stepper2.move(-100000);
+      stepper2.move(-100);
       break;
     case 'Y':
       stepper1.enableOutputs();
